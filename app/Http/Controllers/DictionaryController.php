@@ -124,4 +124,25 @@ class DictionaryController extends Controller
             'hasPrev' => $history->currentPage() > 1,
         ], 200);
     }
+
+    public function getUserFavorites()
+    {
+        $user = JWTAuth::user();
+
+        $favorites = WordFavorite::where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get(['word', 'created_at']);
+
+        $formattedFavorites = $favorites->map(function ($item) {
+            return [
+                'word' => $item->word,
+                'added' => $item->created_at->toIso8601String(),
+            ];
+        });
+
+        return response()->json([
+            'results' => $formattedFavorites,
+        ], 200);
+    }
+
 }
