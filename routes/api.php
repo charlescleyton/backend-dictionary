@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DictionaryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +15,12 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+
+Route::get('/', function () {
+    return response()->json([
+        'message' => 'Fullstack Challenge 🏅 - Dictionary'
+    ]);
+});
 
 Route::post('/auth/signup', [AuthController::class, 'signup']);
 Route::post('/auth/signin', [AuthController::class, 'signin']);
