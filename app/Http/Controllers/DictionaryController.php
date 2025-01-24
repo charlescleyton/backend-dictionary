@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\WordFavorite;
-use App\Models\WordHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -45,6 +43,25 @@ class DictionaryController extends Controller
         return response()->json([
             'error' => 'Não foi possível recuperar os dados do dicionário.'
         ], 500);
+    }
+
+    public function getWordInfo($word)
+    {
+        $response = Http::get("https://api.dictionaryapi.dev/api/v2/entries/en/{$word}");
+
+        if ($response->successful()) {
+            $user = JWTAuth::user();
+            $user->history()->create([
+                'word' => $word,
+                'accessed_at' => now(),
+            ]);
+
+            return response()->json([$response->json()],200);
+        }
+
+        return response()->json([
+            'error' => 'Palavra não encontrada.',
+        ], 400);
     }
 
 }
