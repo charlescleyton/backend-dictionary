@@ -95,4 +95,33 @@ class DictionaryController extends Controller
     {
         return response()->json(auth()->user(), 200);
     }
+
+    public function getUserHistory(Request $request)
+    {
+        $user = JWTAuth::user();
+
+        $request->input('page', 1);
+        $limit = $request->input('limit', 10);
+
+        $query = WordHistory::where('user_id', $user->id)
+            ->orderBy('accessed_at', 'desc');
+
+        $history = $query->paginate($limit);
+
+        $formattedHistory = $history->getCollection()->map(function ($item) {
+            return [
+                'word' => $item->word,
+                'added' => $item->accessed_at,
+            ];
+        });
+
+        return response()->json([
+            'results' => $formattedHistory,
+            'totalDocs' => $history->total(),
+            'page' => $history->currentPage(),
+            'totalPages' => $history->lastPage(),
+            'hasNext' => $history->hasMorePages(),
+            'hasPrev' => $history->currentPage() > 1,
+        ], 200);
+    }
 }
