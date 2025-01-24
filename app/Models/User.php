@@ -24,6 +24,12 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(WordHistory::class);
     }
 
+
+    public function favorites()
+    {
+        return $this->hasMany(WordFavorite::class);
+    }
+
     public function getJWTIdentifier()
     {
         return $this->getKey();
