@@ -90,4 +90,9 @@ class DictionaryController extends Controller
             'message' => "Palavra '{$word}' removida dos favoritos.",
         ], 200);
     }
+
+    public function getUserProfile()
+    {
+        return response()->json(auth()->user(), 200);
+    }
 }
