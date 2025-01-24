@@ -29,6 +29,7 @@ Route::get('/entries/en', [DictionaryController::class, 'getDictionaryWords']);
 Route::get('/entries/en/{word}', [DictionaryController::class, 'getWordInfo']);
 
 Route::post('/entries/en/{word}/favorite', [DictionaryController::class, 'addToFavorites']);
+Route::delete('/entries/en/{word}/unfavorite', [DictionaryController::class, 'removeFromFavorites']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

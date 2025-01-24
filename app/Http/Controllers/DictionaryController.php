@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\WordFavorite;
+use App\Models\WordHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -56,7 +58,7 @@ class DictionaryController extends Controller
                 'accessed_at' => now(),
             ]);
 
-            return response()->json([$response->json()],200);
+            return response()->json([$response->json()], 200);
         }
 
         return response()->json([
@@ -77,5 +79,15 @@ class DictionaryController extends Controller
         ], 200);
     }
 
+    public function removeFromFavorites($word)
+    {
+        $user = JWTAuth::user();
 
+        $user->favorites()->where('word', $word)
+            ->delete();
+
+        return response()->json([
+            'message' => "Palavra '{$word}' removida dos favoritos.",
+        ], 200);
+    }
 }
