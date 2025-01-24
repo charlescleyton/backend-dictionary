@@ -64,4 +64,18 @@ class DictionaryController extends Controller
         ], 400);
     }
 
+    public function addToFavorites($word)
+    {
+        $user = JWTAuth::user();
+
+        $user->favorites()->create([
+            'word' => $word,
+        ]);
+
+        return response()->json([
+            'message' => "Palavra '{$word}' adicionada aos favoritos.",
+        ], 200);
+    }
+
+
 }
