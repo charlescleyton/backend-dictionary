@@ -80,8 +80,6 @@ class DictionaryController extends Controller
             ->header('x-response-time', $responseTime);
     }
 
-
-
     public function getWordInfo($word)
     {
         $start = microtime(true);
@@ -91,7 +89,7 @@ class DictionaryController extends Controller
         $cachedResponse = Cache::get($cacheKey);
 
         if ($cachedResponse) {
-            $response = $cachedResponse;
+            $responseData = $cachedResponse;
             $cacheStatus = 'HIT';
         } else {
             $response = Http::get("https://api.dictionaryapi.dev/api/v2/entries/en/{$word}");
@@ -103,7 +101,8 @@ class DictionaryController extends Controller
                     'accessed_at' => now(),
                 ]);
 
-                Cache::put($cacheKey, $response->json(), now()->addMinutes(60));
+                $responseData = $response->json();
+                Cache::put($cacheKey, $responseData, now()->addMinutes(60));
 
                 $cacheStatus = 'MISS';
             } else {
@@ -116,11 +115,10 @@ class DictionaryController extends Controller
         $end = microtime(true);
         $responseTime = round(($end - $start) * 1000, 2);
 
-        return response()->json($response)
+        return response()->json($responseData)
             ->header('x-cache', $cacheStatus)
             ->header('x-response-time', $responseTime);
     }
-
 
     public function addToFavorites($word)
     {
@@ -139,13 +137,21 @@ class DictionaryController extends Controller
     {
         $user = JWTAuth::user();
 
-        $user->favorites()->where('word', $word)
-            ->delete();
+        $favorite = $user->favorites()->where('word', $word)->first();
+
+        if (!$favorite) {
+            return response()->json([
+                'message' => "A palavra '{$word}' não existe nos favoritos.",
+            ], 404);
+        }
+
+        $favorite->delete();
 
         return response()->json([
             'message' => "Palavra '{$word}' removida dos favoritos.",
         ], 200);
     }
+
 
     public function getUserProfile()
     {
