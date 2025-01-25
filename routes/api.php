@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DictionaryController;
+use App\Http\Controllers\WordController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -35,6 +36,8 @@ Route::delete('/entries/en/{word}/unfavorite', [DictionaryController::class, 're
 Route::get('/user/me/favorites', [DictionaryController::class, 'getUserFavorites']);
 
 Route::get('/user/me/history', [DictionaryController::class, 'getUserHistory']);
+
+Route::get('/import-words', [WordController::class, 'importWords']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
