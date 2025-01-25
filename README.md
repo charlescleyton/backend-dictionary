@@ -59,10 +59,11 @@ DB_USERNAME=seu_usuario
 DB_PASSWORD=sua_senha
 ```
 
-### Passo 4: Gerar a Chave de Aplicação
+### Passo 4: Gerar a Chave de Aplicação e a chave JWT 
 Gere a chave de aplicação do Laravel:
 ```
 php artisan key:generate
+php artesão jwt :secret
 ```
 
 ### Passo 5: Rodar as Migrações
@@ -80,7 +81,7 @@ php artisan serve
 ### Passo 7: Rodar os testes unitários
 Iniciar os teste unitários:
 ```
-php artisan test --filter=DictionaryControllerTest`
+php artisan test
 ```
 
 ### Passo 8: Acessar os endpoints 
