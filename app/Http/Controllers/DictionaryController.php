@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\WordFavorite;
 use App\Models\WordHistory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -22,49 +23,104 @@ class DictionaryController extends Controller
         $page = $request->input('page', 1);
         $limit = $request->input('limit', 10);
 
-        $response = Http::get("https://api.dictionaryapi.dev/api/v2/entries/en/{$search}");
+        $start = microtime(true);
 
-        if ($response->successful()) {
-            $words = $response->json();
+        $cacheKey = "dictionary_words_{$search}_page_{$page}_limit_{$limit}";
 
-            $totalDocs = count($words);
-            $totalPages = ceil($totalDocs / $limit);
-            $offset = ($page - 1) * $limit;
-            $results = array_slice($words, $offset, $limit);
+        $cachedResponse = Cache::get($cacheKey);
 
-            return response()->json([
-                'results' => $results,
-                'totalDocs' => $totalDocs,
-                'page' => $page,
-                'totalPages' => $totalPages,
-                'hasNext' => $page < $totalPages,
-                'hasPrev' => $page > 1,
-            ]);
+        if ($cachedResponse) {
+            $response = $cachedResponse;
+            $cacheStatus = 'HIT';
+        } else {
+            $response = Http::get("https://api.dictionaryapi.dev/api/v2/entries/en/{$search}");
+
+            if ($response->successful()) {
+                $words = $response->json();
+
+                $wordList = array_map(function ($entry) {
+                    return $entry['word'];
+                }, $words);
+
+                $totalDocs = count($wordList);
+                $totalPages = ceil($totalDocs / $limit);
+                $offset = ($page - 1) * $limit;
+                $results = array_slice($wordList, $offset, $limit);
+
+                Cache::put($cacheKey, [
+                    'results' => $results,
+                    'totalDocs' => $totalDocs,
+                    'page' => $page,
+                    'totalPages' => $totalPages,
+                    'hasNext' => $page < $totalPages,
+                    'hasPrev' => $page > 1,
+                ], now()->addMinutes(60));
+
+                $cacheStatus = 'MISS';
+                $response = [
+                    'results' => $results,
+                    'totalDocs' => $totalDocs,
+                    'page' => $page,
+                    'totalPages' => $totalPages,
+                    'hasNext' => $page < $totalPages,
+                    'hasPrev' => $page > 1,
+                ];
+            } else {
+                return response()->json([
+                    'error' => 'Não foi possível recuperar os dados do dicionário.',
+                ], 500);
+            }
         }
 
-        return response()->json([
-            'error' => 'Não foi possível recuperar os dados do dicionário.'
-        ], 500);
+        $end = microtime(true);
+        $responseTime = round(($end - $start) * 1000, 2);
+
+        return response()->json($response)
+            ->header('x-cache', $cacheStatus)
+            ->header('x-response-time', $responseTime);
     }
+
+
 
     public function getWordInfo($word)
     {
-        $response = Http::get("https://api.dictionaryapi.dev/api/v2/entries/en/{$word}");
+        $start = microtime(true);
 
-        if ($response->successful()) {
-            $user = JWTAuth::user();
-            $user->history()->create([
-                'word' => $word,
-                'accessed_at' => now(),
-            ]);
+        $cacheKey = "word_info_{$word}";
 
-            return response()->json([$response->json()], 200);
+        $cachedResponse = Cache::get($cacheKey);
+
+        if ($cachedResponse) {
+            $response = $cachedResponse;
+            $cacheStatus = 'HIT';
+        } else {
+            $response = Http::get("https://api.dictionaryapi.dev/api/v2/entries/en/{$word}");
+
+            if ($response->successful()) {
+                $user = JWTAuth::user();
+                $user->history()->create([
+                    'word' => $word,
+                    'accessed_at' => now(),
+                ]);
+
+                Cache::put($cacheKey, $response->json(), now()->addMinutes(60));
+
+                $cacheStatus = 'MISS';
+            } else {
+                return response()->json([
+                    'error' => 'Palavra não encontrada.',
+                ], 400);
+            }
         }
 
-        return response()->json([
-            'error' => 'Palavra não encontrada.',
-        ], 400);
+        $end = microtime(true);
+        $responseTime = round(($end - $start) * 1000, 2);
+
+        return response()->json($response)
+            ->header('x-cache', $cacheStatus)
+            ->header('x-response-time', $responseTime);
     }
+
 
     public function addToFavorites($word)
     {
@@ -144,5 +200,4 @@ class DictionaryController extends Controller
             'results' => $formattedFavorites,
         ], 200);
     }
-
 }
