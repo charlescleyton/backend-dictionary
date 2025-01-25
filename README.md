@@ -77,12 +77,18 @@ Inicie o servidor de desenvolvimento:
 php artisan serve
 ```
 
-### Passo 7 acessar os endpoints 
-Acesse o link a seguir e veja os endpoints para criar usuuário, autenticar usuário e demais funções disponíveis na api.
+### Passo 7: Rodar os testes unitários
+Iniciar os teste unitários:
+```
+php artisan test --filter=DictionaryControllerTest`
+```
+
+### Passo 8: Acessar os endpoints 
+Acesse o link abaixo para consultar os endpoints disponíveis na API, incluindo a criação de usuário, autenticação e outras funcionalidades:
 
 [Documentação Dictionary](https://app.swaggerhub.com/apis/CharlesPereira/Dictionary/1.0.0#/)
 
-### Passo 8 erificar no Banco de Dados
+### Passo 9:  Verificar dados no Banco de Dados
 Você pode verificar as palavras inseridas no banco de dados acessando a tabela criada no seu MySQL.
 
 Contato para mais informações [Charles Pereira](https://github.com/charlescleyton)
