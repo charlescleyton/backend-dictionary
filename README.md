@@ -80,7 +80,7 @@ php artisan serve
 ### Passo 7 acessar os endpoints 
 Acesse o link a seguir e veja os endpoints para criar usuuário, autenticar usuário e demais funções disponíveis na api.
 
-https://app.swaggerhub.com/apis/CharlesPereira/Dictionary/1.0.0#/
+[Documentação Dictionary](https://app.swaggerhub.com/apis/CharlesPereira/Dictionary/1.0.0#/)
 
 ### Passo 8 erificar no Banco de Dados
 Você pode verificar as palavras inseridas no banco de dados acessando a tabela criada no seu MySQL.
