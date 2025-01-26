@@ -92,6 +92,8 @@ Acesse o link abaixo para consultar os endpoints disponíveis na API, incluindo 
 ### Passo 9:  Verificar dados no Banco de Dados
 Você pode verificar as palavras inseridas no banco de dados acessando a tabela criada no seu MySQL.
 
+Video de apresentação do projeto - [Clique Aqui](https://drive.google.com/file/d/1UHHIoh7VlkMb1bTm6EXJnr3YhNaCIWap/view)
+
 Contato para mais informações [Charles Pereira](https://github.com/charlescleyton)
 
 >  This is a challenge by [Coodesh](https://coodesh.com/)
