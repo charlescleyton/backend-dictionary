@@ -63,7 +63,7 @@ DB_PASSWORD=sua_senha
 Gere a chave de aplicação do Laravel:
 ```
 php artisan key:generate
-php artesão jwt :secret
+php artisan jwt:secret
 ```
 
 ### Passo 5: Rodar as Migrações
